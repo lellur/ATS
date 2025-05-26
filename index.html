@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ATS Resume Scanner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+ 
+    body {
+      background-color: #f4f7fa;
+      padding: 40px 20px;
+      color: #333;
+    }
+ 
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+ 
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+ 
+    .main-content {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+ 
+    .upload-section {
+      flex: 1;
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+ 
+    .custom-file-upload {
+      background-color: #3498db;
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+ 
+    .custom-file-upload:hover {
+      background-color: #2980b9;
+    }
+ 
+    input[type="file"] {
+      display: none;
+    }
+ 
+    .output-section {
+      flex: 2;
+      min-width: 400px;
+      background-color: #ecf0f1;
+      padding: 20px;
+      border-radius: 10px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+ 
+    .output-section h2 {
+      margin-bottom: 15px;
+      color: #2c3e50;
+    }
+ 
+    .resume-card {
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+ 
+    .resume-card h3 {
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+      color: #2c3e50;
+    }
+ 
+    .score {
+      font-weight: bold;
+      color: #27ae60;
+    }
+ 
+    .skills {
+      margin-top: 5px;
+      font-size: 0.95rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ATS Resume Scanner</h1>
+ 
+    <div class="main-content">
+      <!-- Upload Section -->
+      <div class="upload-section">
+        <label for="resumeUpload" class="custom-file-upload">
+          Upload Resumes (Multiple)
+          <input type="file" id="resumeUpload" multiple>
+        </label>
+ 
+        <label for="jdUpload" class="custom-file-upload">
+          Upload Job Description (JD)
+          <input type="file" id="jdUpload">
+        </label>
+      </div>
+ 
+      <!-- Output Section -->
+      <div class="output-section">
+        <h2>Scan Results</h2>
+        <div id="outputBox">
+          <!-- Results will be injected here -->
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- JavaScript for Backend Integration -->
+  <script>
+    // Hooks for backend: access files
+    const resumeInput = document.getElementById('resumeUpload');
+    const jdInput = document.getElementById('jdUpload');
+ 
+    resumeInput.addEventListener('change', () => {
+      console.log("Resumes uploaded:", resumeInput.files);
+    });
+ 
+    jdInput.addEventListener('change', () => {
+      console.log("JD uploaded:", jdInput.files);
+    });
+ 
+    // Function backend can call with results data
+    function renderResults(results) {
+      const outputBox = document.getElementById('outputBox');
+      outputBox.innerHTML = ""; // Clear previous results
+ 
+      results.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'resume-card';
+        card.innerHTML = `
+          <h3>${item.name || 'Resume ' + (index + 1)}</h3>
+          <div class="score">ATS Score: ${item.score}%</div>
+          <div class="skills">Skill Match: ${item.skills.join(', ')}</div>
+        `;
+        outputBox.appendChild(card);
+      });
+    }
+ 
+    // Example: Uncomment to test with fake results
+   
+    // renderResults([
+    //   { name: 'John Doe', score: 88, skills: ['Python', 'SQL', 'Data Analysis'] },
+    //   { name: 'Jane Smith', score: 75, skills: ['React', 'JavaScript', 'HTML'] }
+    // ]);
+ 
+  </script>
+</body>
+</html>
