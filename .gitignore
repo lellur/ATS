@@ -1,0 +1,43 @@
+# Created by venv; see https://docs.python.org/3/library/venv.html
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+*.venv
+env/
+venv/
+ENV/
+VENV/
+*.sqlite3
+*.db
+
+# VS Code
+.vscode/
+
+# Flask uploads and temp files
+temp_uploads/
+app/jdfolder/
+app/resumes/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# PyMuPDF cache
+*.xoj
+*.xojr
+
+# Misc
+*.bak
+*.swp

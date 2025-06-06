@@ -138,42 +138,83 @@
  
   <!-- JavaScript for Backend Integration -->
   <script>
-    // Hooks for backend: access files
-    const resumeInput = document.getElementById('resumeUpload');
-    const jdInput = document.getElementById('jdUpload');
- 
-    resumeInput.addEventListener('change', () => {
-      console.log("Resumes uploaded:", resumeInput.files);
+  const resumeInput = document.getElementById('resumeUpload');
+  const jdInput = document.getElementById('jdUpload');
+
+  // Helper: Render results as cards
+  function renderResults(results) {
+    const outputBox = document.getElementById('outputBox');
+    outputBox.innerHTML = ""; // Clear previous results
+
+    results.forEach((item, index) => {
+      const card = document.createElement('div');
+      card.className = 'resume-card';
+      card.innerHTML = `
+        <h3>${item.Resume || 'Resume ' + (index + 1)}</h3>
+        <div class="score">ATS Score: ${item.Score}%</div>
+        <div class="skills">Skill Match: ${item['Matched Skills'] ? item['Matched Skills'].join(', ') : ''}</div>
+        <div>Certifications: ${item.Certifications}</div>
+        <div>Projects: ${item.Projects}</div>
+        <div>Experience (Years): ${item['Experience (Years)']}</div>
+      `;
+      outputBox.appendChild(card);
     });
- 
-    jdInput.addEventListener('change', () => {
-      console.log("JD uploaded:", jdInput.files);
-    });
- 
-    // Function backend can call with results data
-    function renderResults(results) {
-      const outputBox = document.getElementById('outputBox');
-      outputBox.innerHTML = ""; // Clear previous results
- 
-      results.forEach((item, index) => {
-        const card = document.createElement('div');
-        card.className = 'resume-card';
-        card.innerHTML = `
-          <h3>${item.name || 'Resume ' + (index + 1)}</h3>
-          <div class="score">ATS Score: ${item.score}%</div>
-          <div class="skills">Skill Match: ${item.skills.join(', ')}</div>
-        `;
-        outputBox.appendChild(card);
-      });
+  }
+
+  // Step 1: Upload files to /api/upload, then call /api/score
+  async function uploadAndScore() {
+    const resumes = resumeInput.files;
+    const jd = jdInput.files[0];
+
+    if (!jd || resumes.length === 0) {
+      alert("Please upload both JD and at least one resume.");
+      return;
     }
- 
-    // Example: Uncomment to test with fake results
-   
-    // renderResults([
-    //   { name: 'John Doe', score: 88, skills: ['Python', 'SQL', 'Data Analysis'] },
-    //   { name: 'Jane Smith', score: 75, skills: ['React', 'JavaScript', 'HTML'] }
-    // ]);
- 
-  </script>
+
+    const formData = new FormData();
+    formData.append("jd", jd);
+    for (let i = 0; i < resumes.length; i++) {
+      formData.append("resumes", resumes[i]);
+    }
+
+    const outputBox = document.getElementById('outputBox');
+    outputBox.innerHTML = "<div>Processing, please wait...</div>";
+
+    try {
+      // 1. Upload and format files
+      const uploadResp = await fetch("/api/upload", {
+        method: "POST",
+        body: formData
+      });
+      if (!uploadResp.ok) throw new Error("Upload failed");
+      await uploadResp.json();
+
+      // 2. Get scoring results
+      const scoreResp = await fetch("/api/score");
+      if (!scoreResp.ok) throw new Error("Scoring failed");
+      const scoreData = await scoreResp.json();
+
+      if (scoreData.Results) {
+        renderResults(scoreData.Results);
+      } else {
+        outputBox.innerHTML = "<div style='color:red;'>No results found.</div>";
+      }
+    } catch (err) {
+      outputBox.innerHTML = "<div style='color:red;'>Error: " + err.message + "</div>";
+    }
+  }
+
+  // Trigger upload and scoring when both files are selected
+  resumeInput.addEventListener('change', () => {
+    if (jdInput.files.length > 0 && resumeInput.files.length > 0) {
+      uploadAndScore();
+    }
+  });
+  jdInput.addEventListener('change', () => {
+    if (jdInput.files.length > 0 && resumeInput.files.length > 0) {
+      uploadAndScore();
+    }
+  });
+</script>
 </body>
 </html>
