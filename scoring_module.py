@@ -127,12 +127,34 @@ def extract_experience_years(text):
     match = re.search(r'(\d{1,2})\+?\s*(years|yrs)\b.*?\b(experience|expertise)?', text.lower())
     return int(match.group(1)) if match else 0
 def calculate_score(matched_skills, jd_skills, certs, projects, exp):
-    skill_score = len(matched_skills) / len(jd_skills) * 40 if jd_skills else 0
-    cert_score = min(certs, 5) * 4  # Max 20
-    proj_score = min(projects, 5) * 4  # Max 20
-    exp_score = min(exp, 10) * 2     # Max 20
+    # Weight distribution
+    max_skill_weight = 40
+    max_cert_weight = 10
+    max_proj_weight = 30
+    max_exp_weight = 20
+
+    # Skills (proportional to JD)
+    skill_score = (len(matched_skills) / len(jd_skills)) * max_skill_weight if jd_skills else 0
+
+    # Certifications (max 3 = 10 points)
+    cert_score = min(certs, 3) / 3 * max_cert_weight
+
+    # Projects (max 8 = 30 points)
+    proj_score = min(projects, 8) / 8 * max_proj_weight
+
+    # Experience (bucketed)
+    if exp <= 5:
+        exp_score = 5
+    elif 6 <= exp <= 10:
+        exp_score = 10
+    elif 11 <= exp <= 15:
+        exp_score = 15
+    else:
+        exp_score = 20
+
     total_score = skill_score + cert_score + proj_score + exp_score
     return round(total_score, 2)
+
 
 def read_file(path):
     if path.endswith('.txt'):
@@ -182,13 +204,23 @@ def process_folder():
             'Experience (Years)': exp_years,
             'Score': score
         })
+    jd_name = jd_files[0]
+
+    # Delete files after processing
+    try:
+        os.remove(jd_path)
+        for filename in os.listdir(RESUME_FOLDER):
+            filepath = os.path.join(RESUME_FOLDER, filename)
+            if os.path.isfile(filepath):
+                os.remove(filepath)
+    except Exception as e:
+        print(f"Error deleting files: {e}")
 
     return jsonify({
-        "JD File": jd_files[0],
+        "JD File": jd_name,
         "JD Skills": jd_skills,
         "Results": results
     })
-
 # --- Run App ---
 if __name__ == '__main__':
     app.run(debug=True)

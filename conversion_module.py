@@ -86,48 +86,6 @@ SECTION_END_KEYWORDS = [
         "capabilities", "technical skills required", "experience","professional experience","work experience","career experience","experience highlights",
 ]
 
-# def extract_projects(text,project_keywords):
-#     lines = text.splitlines()
-#     projects = []
-#     current_project = ""
-#     collecting = False
-
-#     for line in lines:
-#         line = line.strip()
-
-#         if not line:
-#             continue
-
-#         # Detect project section heading
-#         if any(kw in line.lower() for kw in project_keywords):
-#             collecting = True
-#             current_project = ""
-#             continue
-
-#         # Detect project line even without section heading
-#         if PROJECT_LINE_PATTERN.match(line):
-#             collecting = True  # <-- This line is added!
-#             if current_project:
-#                 projects.append(current_project.strip())
-#             current_project = line + "\n"
-#             continue
-
-#         # Stop if a non-project section begins
-#         if collecting and any(kw in line.lower() for kw in SECTION_END_KEYWORDS):
-#             collecting = False
-#             if current_project:
-#                 projects.append(current_project.strip())
-#                 current_project = ""
-#             continue
-
-#         # If collecting project content
-#         if collecting:
-#             current_project += line + "\n"
-
-#     if current_project:
-#         projects.append(current_project.strip())
-
-#     return projects
 def extract_project_title_and_role(text):
     lines = text.splitlines()
     projects = []
@@ -207,7 +165,7 @@ def format_resume(text):
         "development tools", "programming languages", "frameworks & technologies", "platforms",
         "software proficiency", "it skills", "programming skills", "software skills", "technology experience",
         "engineering skills", "professional skills", "summary of skills", "specialized skills", "it proficiency",
-        "capabilities", "technical skills required"
+        "capabilities", "technical skills required","required Skills:"
     ]
 
     certs = extract_section_items(text, cert_keywords)
